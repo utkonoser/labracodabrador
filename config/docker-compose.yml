@@ -18,13 +18,13 @@ services:
           --http.corsdomain='*' --http.vhosts='*' \
           --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=eth,net,web3,admin,personal --ws.origins='*' \
           --allow-insecure-unlock --unlock=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --password=/password.txt \
-          --mine --miner.etherbase=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+          --mine --miner.etherbase=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --miner.gasprice=0 \
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer1-data:/data
-      - ./signer1-init/keystore:/data/keystore
-      - ./config/genesis-poa.json:/genesis.json
-      - ./password.txt:/password.txt
+      - ../signer1-init/keystore:/data/keystore
+      - ./genesis-poa.json:/genesis.json
+      - ../password.txt:/password.txt
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.11
@@ -52,13 +52,13 @@ services:
           --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,admin,personal,miner,txpool,debug \
           --http.corsdomain='*' --http.vhosts='*' \
           --allow-insecure-unlock --unlock=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 --password=/password.txt \
-          --mine --miner.etherbase=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
+          --mine --miner.etherbase=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 --miner.gasprice=0 \
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer2-data:/data
-      - ./signer2-init/keystore:/data/keystore
-      - ./config/genesis-poa.json:/genesis.json
-      - ./password.txt:/password.txt
+      - ../signer2-init/keystore:/data/keystore
+      - ./genesis-poa.json:/genesis.json
+      - ../password.txt:/password.txt
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.12
@@ -86,13 +86,13 @@ services:
           --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,admin,personal,miner,txpool,debug \
           --http.corsdomain='*' --http.vhosts='*' \
           --allow-insecure-unlock --unlock=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --password=/password.txt \
-          --mine --miner.etherbase=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC \
+          --mine --miner.etherbase=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --miner.gasprice=0 \
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer3-data:/data
-      - ./signer3-init/keystore:/data/keystore
-      - ./config/genesis-poa.json:/genesis.json
-      - ./password.txt:/password.txt
+      - ../signer3-init/keystore:/data/keystore
+      - ./genesis-poa.json:/genesis.json
+      - ../password.txt:/password.txt
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.13
@@ -123,7 +123,7 @@ services:
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc1-data:/data
-      - ./config/genesis-poa.json:/genesis.json
+      - ./genesis-poa.json:/genesis.json
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.21
@@ -154,7 +154,7 @@ services:
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc2-data:/data
-      - ./config/genesis-poa.json:/genesis.json
+      - ./genesis-poa.json:/genesis.json
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.22
@@ -174,7 +174,7 @@ services:
       - "8545:8545"
       - "8546:8546"
     volumes:
-      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - blockchain-network
     depends_on:
@@ -199,7 +199,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     networks:
       - blockchain-network
@@ -246,7 +246,7 @@ services:
     image: nginx:alpine
     container_name: labracodabrador-web-explorer
     volumes:
-      - ./web-explorer:/usr/share/nginx/html:ro
+      - ../web-explorer:/usr/share/nginx/html:ro
     ports:
       - "8080:80"
     networks:
