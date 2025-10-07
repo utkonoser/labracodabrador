@@ -1,0 +1,30 @@
+# Data directories
+*-init/
+*-data/
+jwt/
+logs/
+geth-data/
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Secrets
+password.txt
+
+# Build outputs
+bin/
+
+# Go
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

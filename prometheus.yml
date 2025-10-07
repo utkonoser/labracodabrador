@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'labracodabrador'
+    network: 'poa'
+
+scrape_configs:
+  # Signer nodes
+  - job_name: 'signer1'
+    static_configs:
+      - targets: ['172.25.0.11:6060']
+        labels:
+          node_type: 'signer'
+          node_name: 'signer1'
+
+  - job_name: 'signer2'
+    static_configs:
+      - targets: ['172.25.0.12:6060']
+        labels:
+          node_type: 'signer'
+          node_name: 'signer2'
+
+  - job_name: 'signer3'
+    static_configs:
+      - targets: ['172.25.0.13:6060']
+        labels:
+          node_type: 'signer'
+          node_name: 'signer3'
+
+  # RPC nodes
+  - job_name: 'rpc1'
+    static_configs:
+      - targets: ['172.25.0.21:6060']
+        labels:
+          node_type: 'rpc'
+          node_name: 'rpc1'
+
+  - job_name: 'rpc2'
+    static_configs:
+      - targets: ['172.25.0.22:6060']
+        labels:
+          node_type: 'rpc'
+          node_name: 'rpc2'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+

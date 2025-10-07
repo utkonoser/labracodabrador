@@ -1,0 +1,281 @@
+version: '3.8'
+
+services:
+  # Signer Node 1 (создает блоки)
+  signer1:
+    image: ethereum/client-go:v1.13.15
+    container_name: labracodabrador-signer1
+    command:
+      - --networkid=32382
+      - --datadir=/data
+      - --syncmode=full
+      - --port=30303
+      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=eth,net,web3,admin,personal
+      - --ws.origins=*
+      - --allow-insecure-unlock
+      - --unlock=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      - --password=/password.txt
+      - --mine
+      - --miner.etherbase=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      - --metrics
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=6060
+      - --verbosity=3
+    volumes:
+      - signer1-data:/data
+      - ./genesis-poa.json:/genesis.json
+      - ./password.txt:/password.txt
+    networks:
+      blockchain-network:
+        ipv4_address: 172.25.0.11
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber http://localhost:8545 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Signer Node 2
+  signer2:
+    image: ethereum/client-go:v1.13.15
+    container_name: labracodabrador-signer2
+    command:
+      - --networkid=32382
+      - --datadir=/data
+      - --syncmode=full
+      - --port=30303
+      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --allow-insecure-unlock
+      - --unlock=0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+      - --password=/password.txt
+      - --mine
+      - --miner.etherbase=0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+      - --metrics
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=6060
+      - --verbosity=3
+    volumes:
+      - signer2-data:/data
+      - ./genesis-poa.json:/genesis.json
+      - ./password.txt:/password.txt
+    networks:
+      blockchain-network:
+        ipv4_address: 172.25.0.12
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber http://localhost:8545 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Signer Node 3
+  signer3:
+    image: ethereum/client-go:v1.13.15
+    container_name: labracodabrador-signer3
+    command:
+      - --networkid=32382
+      - --datadir=/data
+      - --syncmode=full
+      - --port=30303
+      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --allow-insecure-unlock
+      - --unlock=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+      - --password=/password.txt
+      - --mine
+      - --miner.etherbase=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+      - --metrics
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=6060
+      - --verbosity=3
+    volumes:
+      - signer3-data:/data
+      - ./genesis-poa.json:/genesis.json
+      - ./password.txt:/password.txt
+    networks:
+      blockchain-network:
+        ipv4_address: 172.25.0.13
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber http://localhost:8545 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # RPC Node 1 (только RPC, не майнит)
+  rpc1:
+    image: ethereum/client-go:v1.13.15
+    container_name: labracodabrador-rpc1
+    command:
+      - --networkid=32382
+      - --datadir=/data
+      - --syncmode=full
+      - --port=30303
+      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,txpool,debug,admin
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=eth,net,web3
+      - --ws.origins=*
+      - --metrics
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=6060
+      - --verbosity=3
+      - --netrestrict=172.25.0.0/16
+    volumes:
+      - rpc1-data:/data
+      - ./genesis-poa.json:/genesis.json
+    networks:
+      blockchain-network:
+        ipv4_address: 172.25.0.21
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber http://localhost:8545 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # RPC Node 2
+  rpc2:
+    image: ethereum/client-go:v1.13.15
+    container_name: labracodabrador-rpc2
+    command:
+      - --networkid=32382
+      - --datadir=/data
+      - --syncmode=full
+      - --port=30303
+      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,txpool,debug,admin
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=eth,net,web3
+      - --ws.origins=*
+      - --metrics
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=6060
+      - --verbosity=3
+      - --netrestrict=172.25.0.0/16
+    volumes:
+      - rpc2-data:/data
+      - ./genesis-poa.json:/genesis.json
+    networks:
+      blockchain-network:
+        ipv4_address: 172.25.0.22
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber http://localhost:8545 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: labracodabrador-nginx
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - blockchain-network
+    depends_on:
+      - rpc1
+      - rpc2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Prometheus для мониторинга
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: labracodabrador-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - blockchain-network
+    restart: unless-stopped
+
+  # Grafana для визуализации
+  grafana:
+    image: grafana/grafana:latest
+    container_name: labracodabrador-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - blockchain-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+networks:
+  blockchain-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  signer1-data:
+  signer2-data:
+  signer3-data:
+  rpc1-data:
+  rpc2-data:
+  prometheus-data:
+  grafana-data:
