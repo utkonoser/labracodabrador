@@ -5,34 +5,24 @@ services:
   signer1:
     image: ethereum/client-go:v1.13.15
     container_name: labracodabrador-signer1
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - --networkid=32382
-      - --datadir=/data
-      - --syncmode=full
-      - --port=30303
-      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
-      - --http.corsdomain=*
-      - --http.vhosts=*
-      - --ws
-      - --ws.addr=0.0.0.0
-      - --ws.port=8546
-      - --ws.api=eth,net,web3,admin,personal
-      - --ws.origins=*
-      - --allow-insecure-unlock
-      - --unlock=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-      - --password=/password.txt
-      - --mine
-      - --miner.etherbase=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-      - --metrics
-      - --metrics.addr=0.0.0.0
-      - --metrics.port=6060
-      - --verbosity=3
+      - |
+        if [ ! -f /data/geth/chaindata/CURRENT ]; then
+          echo "Initializing genesis..."
+          geth init --datadir=/data /genesis.json
+        fi
+        exec geth --networkid=32382 --datadir=/data --syncmode=full --port=30303 \
+          --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303 \
+          --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,admin,personal,miner,txpool,debug \
+          --http.corsdomain='*' --http.vhosts='*' \
+          --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=eth,net,web3,admin,personal --ws.origins='*' \
+          --allow-insecure-unlock --unlock=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --password=/password.txt \
+          --mine --miner.etherbase=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+          --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer1-data:/data
+      - ./signer1-init/keystore:/data/keystore
       - ./genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
@@ -50,29 +40,23 @@ services:
   signer2:
     image: ethereum/client-go:v1.13.15
     container_name: labracodabrador-signer2
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - --networkid=32382
-      - --datadir=/data
-      - --syncmode=full
-      - --port=30303
-      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
-      - --http.corsdomain=*
-      - --http.vhosts=*
-      - --allow-insecure-unlock
-      - --unlock=0x70997970C51812dc3A010C7d01b50e0d17dc79C8
-      - --password=/password.txt
-      - --mine
-      - --miner.etherbase=0x70997970C51812dc3A010C7d01b50e0d17dc79C8
-      - --metrics
-      - --metrics.addr=0.0.0.0
-      - --metrics.port=6060
-      - --verbosity=3
+      - |
+        if [ ! -f /data/geth/chaindata/CURRENT ]; then
+          echo "Initializing genesis..."
+          geth init --datadir=/data /genesis.json
+        fi
+        exec geth --networkid=32382 --datadir=/data --syncmode=full --port=30303 \
+          --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303 \
+          --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,admin,personal,miner,txpool,debug \
+          --http.corsdomain='*' --http.vhosts='*' \
+          --allow-insecure-unlock --unlock=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 --password=/password.txt \
+          --mine --miner.etherbase=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
+          --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer2-data:/data
+      - ./signer2-init/keystore:/data/keystore
       - ./genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
@@ -90,29 +74,23 @@ services:
   signer3:
     image: ethereum/client-go:v1.13.15
     container_name: labracodabrador-signer3
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - --networkid=32382
-      - --datadir=/data
-      - --syncmode=full
-      - --port=30303
-      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=eth,net,web3,admin,personal,miner,txpool,debug
-      - --http.corsdomain=*
-      - --http.vhosts=*
-      - --allow-insecure-unlock
-      - --unlock=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
-      - --password=/password.txt
-      - --mine
-      - --miner.etherbase=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
-      - --metrics
-      - --metrics.addr=0.0.0.0
-      - --metrics.port=6060
-      - --verbosity=3
+      - |
+        if [ ! -f /data/geth/chaindata/CURRENT ]; then
+          echo "Initializing genesis..."
+          geth init --datadir=/data /genesis.json
+        fi
+        exec geth --networkid=32382 --datadir=/data --syncmode=full --port=30303 \
+          --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303 \
+          --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,admin,personal,miner,txpool,debug \
+          --http.corsdomain='*' --http.vhosts='*' \
+          --allow-insecure-unlock --unlock=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --password=/password.txt \
+          --mine --miner.etherbase=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC \
+          --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3
     volumes:
       - signer3-data:/data
+      - ./signer3-init/keystore:/data/keystore
       - ./genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
@@ -130,28 +108,19 @@ services:
   rpc1:
     image: ethereum/client-go:v1.13.15
     container_name: labracodabrador-rpc1
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - --networkid=32382
-      - --datadir=/data
-      - --syncmode=full
-      - --port=30303
-      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=eth,net,web3,txpool,debug,admin
-      - --http.corsdomain=*
-      - --http.vhosts=*
-      - --ws
-      - --ws.addr=0.0.0.0
-      - --ws.port=8546
-      - --ws.api=eth,net,web3
-      - --ws.origins=*
-      - --metrics
-      - --metrics.addr=0.0.0.0
-      - --metrics.port=6060
-      - --verbosity=3
-      - --netrestrict=172.25.0.0/16
+      - |
+        if [ ! -f /data/geth/chaindata/CURRENT ]; then
+          echo "Initializing genesis..."
+          geth init --datadir=/data /genesis.json
+        fi
+        exec geth --networkid=32382 --datadir=/data --syncmode=full --port=30303 \
+          --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303 \
+          --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,txpool,debug,admin \
+          --http.corsdomain='*' --http.vhosts='*' \
+          --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=eth,net,web3 --ws.origins='*' \
+          --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc1-data:/data
       - ./genesis-poa.json:/genesis.json
@@ -170,28 +139,19 @@ services:
   rpc2:
     image: ethereum/client-go:v1.13.15
     container_name: labracodabrador-rpc2
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - --networkid=32382
-      - --datadir=/data
-      - --syncmode=full
-      - --port=30303
-      - --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=eth,net,web3,txpool,debug,admin
-      - --http.corsdomain=*
-      - --http.vhosts=*
-      - --ws
-      - --ws.addr=0.0.0.0
-      - --ws.port=8546
-      - --ws.api=eth,net,web3
-      - --ws.origins=*
-      - --metrics
-      - --metrics.addr=0.0.0.0
-      - --metrics.port=6060
-      - --verbosity=3
-      - --netrestrict=172.25.0.0/16
+      - |
+        if [ ! -f /data/geth/chaindata/CURRENT ]; then
+          echo "Initializing genesis..."
+          geth init --datadir=/data /genesis.json
+        fi
+        exec geth --networkid=32382 --datadir=/data --syncmode=full --port=30303 \
+          --bootnodes=enode://b8f591899fb03f7b8b4d21e56d3cd1212b953fd6964f06c396c063ca408cbc2e6612e39daaa969fdd0510f9c015ad4ce0fb94b2fcbf61617477a83eb0b7e2d6d@172.25.0.11:30303,enode://bd9f2fd4e53e713e0d1313152adec7d989885957ea1eff691712d7ad0e153b7e2697a816fc3f6ba191672ac5e5686d040b44babc1caf4d0efb38394816b6bb9d@172.25.0.12:30303,enode://481d481ce1a4cb6dbb168fa6c5baa30d12a883c14423b22abb2f311af1c0a27c76898c13bd19622cf6082deb51dfa6bef4a90ed1abb85c4dfb7395abc63df728@172.25.0.13:30303 \
+          --http --http.addr=0.0.0.0 --http.port=8545 --http.api=eth,net,web3,txpool,debug,admin \
+          --http.corsdomain='*' --http.vhosts='*' \
+          --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=eth,net,web3 --ws.origins='*' \
+          --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc2-data:/data
       - ./genesis-poa.json:/genesis.json

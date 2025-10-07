@@ -21,7 +21,7 @@ fi
 echo "🔨 Initializing Geth..."
 docker run --rm \
     -v $(pwd)/geth-data:/data \
-    -v $(pwd)/genesis-pos.json:/genesis.json:ro \
+    -v $(pwd)/genesis-poa.json:/genesis.json:ro \
     ethereum/client-go:v1.14.11 \
     init --datadir=/data /genesis.json
 
