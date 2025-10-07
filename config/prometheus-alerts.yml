@@ -1,0 +1,117 @@
+groups:
+  - name: blockchain_alerts
+    interval: 30s
+    rules:
+      # Узел недоступен
+      - alert: NodeDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Узел {{ $labels.node_name }} недоступен"
+          description: "Узел {{ $labels.node_name }} ({{ $labels.job }}) не отвечает более 2 минут"
+
+      # Нет новых блоков
+      - alert: NoNewBlocks
+        expr: rate(chain_head_block[5m]) == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Блокчейн не создает новые блоки"
+          description: "Узел {{ $labels.node_name }} не получал новых блоков более 3 минут. Текущий блок: {{ $value }}"
+
+      # Мало пиров
+      - alert: LowPeerCount
+        expr: p2p_peers < 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Мало подключенных пиров на узле {{ $labels.node_name }}"
+          description: "У узла {{ $labels.node_name }} только {{ $value }} подключенных пиров (норма >= 2)"
+
+      # Высокая загрузка CPU
+      - alert: HighCPUUsage
+        expr: rate(system_cpu_sysload[5m]) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая загрузка CPU на узле {{ $labels.node_name }}"
+          description: "Загрузка CPU на узле {{ $labels.node_name }} превышает 80% в течение 10 минут: {{ $value }}%"
+
+      # Высокое использование памяти
+      - alert: HighMemoryUsage
+        expr: system_memory_allocs > 1000000000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокое использование памяти на узле {{ $labels.node_name }}"
+          description: "Узел {{ $labels.node_name }} использует более 1GB памяти: {{ $value }} байт"
+
+      # Большой пул транзакций
+      - alert: LargeTxPoolPending
+        expr: txpool_pending > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Большой пул ожидающих транзакций на узле {{ $labels.node_name }}"
+          description: "В пуле узла {{ $labels.node_name }} накопилось {{ $value }} ожидающих транзакций"
+
+      # Низкая скорость обработки транзакций
+      - alert: LowTxProcessingRate
+        expr: rate(txpool_valid[5m]) < 1 and txpool_pending > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Низкая скорость обработки транзакций на узле {{ $labels.node_name }}"
+          description: "Узел {{ $labels.node_name }} медленно обрабатывает транзакции при наличии {{ $value }} ожидающих"
+
+      # Проблемы с синхронизацией
+      - alert: SyncIssues
+        expr: rate(eth_db_chaindata_compact_time[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Возможны проблемы с синхронизацией на узле {{ $labels.node_name }}"
+          description: "Узел {{ $labels.node_name }} тратит много времени на компактификацию БД"
+
+      # RPC перегружен
+      - alert: HighRPCLatency
+        expr: rate(rpc_duration_all[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая задержка RPC на узле {{ $labels.node_name }}"
+          description: "Среднее время ответа RPC на узле {{ $labels.node_name }} превышает 1 секунду"
+
+  - name: blockchain_health
+    interval: 1m
+    rules:
+      # Консенсус работает (записываем для истории)
+      - record: blockchain:consensus:health
+        expr: rate(chain_head_block[5m]) > 0
+
+      # Средняя скорость создания блоков
+      - record: blockchain:block_rate:5m
+        expr: rate(chain_head_block[5m]) * 60
+
+      # Общее количество пиров в сети
+      - record: blockchain:total_peers
+        expr: sum(p2p_peers)
+
+      # Среднее количество пиров на узел
+      - record: blockchain:avg_peers_per_node
+        expr: avg(p2p_peers)
+
+      # Общий размер txpool в сети
+      - record: blockchain:total_txpool_pending
+        expr: sum(txpool_pending)
+
