@@ -207,6 +207,34 @@ services:
       - blockchain-network
     restart: unless-stopped
 
+  # Loki для логирования
+  loki:
+    image: grafana/loki:latest
+    container_name: labracodabrador-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki.yml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    networks:
+      - blockchain-network
+    restart: unless-stopped
+
+  # Promtail для сбора логов
+  promtail:
+    image: grafana/promtail:latest
+    container_name: labracodabrador-promtail
+    volumes:
+      - ./promtail.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - blockchain-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
   # Grafana для визуализации
   grafana:
     image: grafana/grafana:latest
@@ -224,6 +252,7 @@ services:
       - blockchain-network
     depends_on:
       - prometheus
+      - loki
     restart: unless-stopped
 
   # API Server - REST API для blockchain данных
@@ -271,4 +300,5 @@ volumes:
   rpc1-data:
   rpc2-data:
   prometheus-data:
+  loki-data:
   grafana-data:
