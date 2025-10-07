@@ -412,9 +412,3 @@ labracodabrador/
 
 MIT License
 
----
-
-**Создано по Google Go Style Guide с использованием slog для логирования** 📝
-
-**Ready for Production!** 🚀
-
