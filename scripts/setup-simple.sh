@@ -21,7 +21,7 @@ fi
 echo "🔨 Initializing Geth..."
 docker run --rm \
     -v $(pwd)/geth-data:/data \
-    -v $(pwd)/genesis-poa.json:/genesis.json:ro \
+    -v $(pwd)/config/genesis-poa.json:/genesis.json:ro \
     ethereum/client-go:v1.14.11 \
     init --datadir=/data /genesis.json
 
@@ -31,7 +31,8 @@ echo ""
 echo "✅ Setup complete!"
 echo ""
 echo "🚀 Start the network:"
-echo "   docker-compose up -d"
+echo "   make run"
+echo "   # или: docker-compose -f config/docker-compose.yml up -d"
 echo ""
 echo "📊 Monitor:"
 echo "   docker-compose ps"

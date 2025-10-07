@@ -23,7 +23,7 @@ services:
     volumes:
       - signer1-data:/data
       - ./signer1-init/keystore:/data/keystore
-      - ./genesis-poa.json:/genesis.json
+      - ./config/genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
       blockchain-network:
@@ -57,7 +57,7 @@ services:
     volumes:
       - signer2-data:/data
       - ./signer2-init/keystore:/data/keystore
-      - ./genesis-poa.json:/genesis.json
+      - ./config/genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
       blockchain-network:
@@ -91,7 +91,7 @@ services:
     volumes:
       - signer3-data:/data
       - ./signer3-init/keystore:/data/keystore
-      - ./genesis-poa.json:/genesis.json
+      - ./config/genesis-poa.json:/genesis.json
       - ./password.txt:/password.txt
     networks:
       blockchain-network:
@@ -123,7 +123,7 @@ services:
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc1-data:/data
-      - ./genesis-poa.json:/genesis.json
+      - ./config/genesis-poa.json:/genesis.json
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.21
@@ -154,7 +154,7 @@ services:
           --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --verbosity=3 --netrestrict=172.25.0.0/16
     volumes:
       - rpc2-data:/data
-      - ./genesis-poa.json:/genesis.json
+      - ./config/genesis-poa.json:/genesis.json
     networks:
       blockchain-network:
         ipv4_address: 172.25.0.22
@@ -174,7 +174,7 @@ services:
       - "8545:8545"
       - "8546:8546"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - blockchain-network
     depends_on:
@@ -199,7 +199,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     networks:
       - blockchain-network
@@ -227,8 +227,8 @@ services:
   # API Server - REST API для blockchain данных
   api-server:
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ${PWD:-.}
+      dockerfile: docker/Dockerfile.api
     container_name: labracodabrador-api
     ports:
       - "8081:8081"

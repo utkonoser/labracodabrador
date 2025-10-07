@@ -45,15 +45,9 @@ temp/
 .env.local
 .env.production
 
-# Node modules (если используются примеры)
-node_modules/
-package-lock.json
-
-# Python (если используются примеры)
-__pycache__/
-*.pyc
-venv/
-.venv/
+# Бинарные файлы
+bin/
+*.exe
 
 # Мониторинг данные
 grafana/data/

@@ -35,9 +35,9 @@ fi
 
 # Бэкап конфигурации
 echo "⚙️  Backing up configuration..."
-cp docker-compose.yml "$BACKUP_DIR/"
-cp genesis-poa.json "$BACKUP_DIR/"
-cp nginx.conf "$BACKUP_DIR/"
+cp config/docker-compose.yml "$BACKUP_DIR/"
+cp config/genesis-poa.json "$BACKUP_DIR/"
+cp config/nginx.conf "$BACKUP_DIR/"
 
 # Создать единый архив
 echo "📚 Creating final archive..."

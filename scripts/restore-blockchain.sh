@@ -30,7 +30,7 @@ fi
 
 # Остановить контейнеры
 echo "🛑 Stopping containers..."
-docker-compose down
+cd "$(dirname "$0")/.." && docker-compose -f config/docker-compose.yml down
 
 # Распаковать бэкап
 echo "📦 Extracting backup..."
@@ -71,9 +71,9 @@ rm -rf "$RESTORE_DIR"
 
 # Запустить контейнеры
 echo "🚀 Starting containers..."
-docker-compose up -d
+cd "$(dirname "$0")/.." && docker-compose -f config/docker-compose.yml up -d
 
 echo "✅ Restore completed!"
-echo "📊 Check status with: docker-compose ps"
-echo "📋 Check logs with: docker-compose logs -f"
+echo "📊 Check status with: make ps"
+echo "📋 Check logs with: make logs"
 
