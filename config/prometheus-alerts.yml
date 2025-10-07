@@ -72,25 +72,25 @@ groups:
           summary: "Низкая скорость обработки транзакций на узле {{ $labels.node_name }}"
           description: "Узел {{ $labels.node_name }} медленно обрабатывает транзакции при наличии {{ $value }} ожидающих"
 
-      # Проблемы с синхронизацией
+      # Проблемы с синхронизацией (компактификация БД занимает > 10% времени)
       - alert: SyncIssues
-        expr: rate(eth_db_chaindata_compact_time[5m]) > 10
-        for: 5m
+        expr: rate(eth_db_chaindata_compact_time[5m]) > 100000000
+        for: 10m
         labels:
           severity: warning
         annotations:
           summary: "Возможны проблемы с синхронизацией на узле {{ $labels.node_name }}"
-          description: "Узел {{ $labels.node_name }} тратит много времени на компактификацию БД"
+          description: "Узел {{ $labels.node_name }} тратит слишком много времени на компактификацию БД: {{ $value | humanize }}ns/s"
 
-      # RPC перегружен
+      # RPC перегружен (проверяем 99-й перцентиль)
       - alert: HighRPCLatency
-        expr: rate(rpc_duration_all[5m]) > 1000
+        expr: rpc_duration_all{quantile="0.99"} > 5000000000
         for: 5m
         labels:
           severity: warning
         annotations:
           summary: "Высокая задержка RPC на узле {{ $labels.node_name }}"
-          description: "Среднее время ответа RPC на узле {{ $labels.node_name }} превышает 1 секунду"
+          description: "99-й перцентиль времени ответа RPC на узле {{ $labels.node_name }} превышает 5 секунд: {{ $value | humanize }}ns"
 
   - name: blockchain_health
     interval: 1m
