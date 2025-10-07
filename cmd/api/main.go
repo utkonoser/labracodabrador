@@ -163,11 +163,8 @@ func getLatestBlocks(w http.ResponseWriter, r *http.Request) {
 
 	// Получаем последние 6 блоков
 	var blocks []BlockInfo
-	for i := uint64(0); i < 6; i++ {
+	for i := uint64(0); i < 6 && i <= latestBlock; i++ {
 		blockNum := latestBlock - i
-		if blockNum < 0 {
-			break
-		}
 
 		block, err := client.BlockByNumber(ctx, big.NewInt(int64(blockNum)))
 		if err != nil {
@@ -253,8 +250,18 @@ func getAddressInfo(w http.ResponseWriter, r *http.Request) {
 	code, err := client.CodeAt(ctx, address, nil)
 	isContract := len(code) > 0
 
-	// Конвертируем баланс в ETH
-	balanceEth := float64(balance.Int64()) / 1e18
+	// Конвертируем баланс в ETH (используем big.Float для точности)
+	balanceFloat := new(big.Float).SetInt(balance)
+	ethFloat, _ := new(big.Float).SetString("1000000000000000000") // 1e18
+	balanceEthFloat := new(big.Float).Quo(balanceFloat, ethFloat)
+
+	// Проверяем, что результат положительный
+	var balanceEth float64
+	if balanceEthFloat.Sign() < 0 {
+		balanceEth = 0.0
+	} else {
+		balanceEth, _ = balanceEthFloat.Float64()
+	}
 
 	addressInfo := AddressInfo{
 		Address:    addressStr,
