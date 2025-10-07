@@ -107,11 +107,52 @@ certbot certonly --standalone -d your-domain.com
 # (см. PRODUCTION.md)
 ```
 
-### 📊 Мониторинг
+### 📊 Мониторинг и Explorer
 
+- **Web Explorer:** http://your-domain:8080 (blockchain explorer UI)
+- **REST API:** http://your-domain:8081 (JSON endpoints)
 - **Grafana:** http://your-domain:3000 (admin/admin)
 - **Prometheus:** http://your-domain:9090
 - **Metrics endpoint:** http://localhost:6060/debug/metrics
+
+### 🔍 Web Explorer & REST API
+
+Полноценный blockchain explorer с REST API уже встроен:
+
+```bash
+# Запускается автоматически
+docker-compose up -d
+
+# Web Explorer (UI)
+open http://localhost:8080
+
+# REST API
+curl http://localhost:8081/api/v1/network
+```
+
+**Web Explorer функции:**
+- Поиск блоков, транзакций, адресов
+- Балансы адресов в реальном времени
+- Последние блоки с автообновлением
+- Детали транзакций (статус, gas, value)
+
+**REST API endpoints:**
+- `GET /api/v1/network` - Network info
+- `GET /api/v1/blocks/latest` - Latest blocks
+- `GET /api/v1/blocks/{number}` - Block details
+- `GET /api/v1/address/{address}` - Address info
+- `GET /api/v1/transactions/{hash}` - Transaction details
+
+**Преимущества:**
+- ✅ Работает на ЛЮБОЙ платформе (Mac, Linux, Windows)
+- ✅ REST API для интеграции
+- ✅ Не требует базы данных
+- ✅ Легковесный (UI ~100KB, API ~10MB)
+- ✅ Стабильный (REST API вместо прямого RPC)
+
+💡 **Примечание:** Explorer работает через REST API, что обеспечивает стабильность и возможность интеграции с внешними приложениями.
+
+---
 
 ### 🔍 Troubleshooting
 

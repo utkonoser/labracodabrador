@@ -224,6 +224,37 @@ services:
       - prometheus
     restart: unless-stopped
 
+  # API Server - REST API для blockchain данных
+  api-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: labracodabrador-api
+    ports:
+      - "8081:8081"
+    networks:
+      - blockchain-network
+    depends_on:
+      - rpc1
+      - rpc2
+    restart: unless-stopped
+    environment:
+      - RPC_URL=http://nginx:8545
+
+  # Simple Web Explorer - легковесный UI для просмотра блокчейна
+  web-explorer:
+    image: nginx:alpine
+    container_name: labracodabrador-web-explorer
+    volumes:
+      - ./web-explorer:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+    networks:
+      - blockchain-network
+    depends_on:
+      - api-server
+    restart: unless-stopped
+
 networks:
   blockchain-network:
     driver: bridge

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labracodabrador Explorer</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .network-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .content-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .blocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .block-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .block-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .block-number {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .block-info {
+            color: #555;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .address-short {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #090;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .balance-result {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .balance-amount {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .tx-list {
+            list-style: none;
+        }
+
+        .tx-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .tx-hash {
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-connected {
+            background: #00ff00;
+        }
+
+        .status-disconnected {
+            background: #ff0000;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐕 Labracodabrador Explorer</h1>
+            <p class="subtitle">Blockchain Explorer для вашей PoA сети</p>
+            <div class="network-info" id="networkInfo">
+                <div class="info-card">
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        <span class="status-dot status-disconnected" id="statusDot"></span>
+                        <span id="connectionStatus">Connecting...</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Latest Block</div>
+                    <div class="info-value" id="latestBlock">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Chain ID</div>
+                    <div class="info-value" id="chainId">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Gas Price</div>
+                    <div class="info-value" id="gasPrice">-</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-box">
+            <h2 style="margin-bottom: 15px; color: #333;">🔍 Поиск</h2>
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput"
+                placeholder="Введите адрес, hash транзакции или номер блока..."
+            >
+            <div class="button-group">
+                <button onclick="searchAddress()">💰 Баланс адреса</button>
+                <button onclick="searchTransaction()">📝 Транзакция</button>
+                <button onclick="searchBlock()">📦 Блок</button>
+                <button onclick="getLatestBlocks()" style="background: #28a745;">🔄 Обновить блоки</button>
+            </div>
+        </div>
+
+        <div id="resultArea"></div>
+
+        <div class="content-box">
+            <h2 style="margin-bottom: 20px; color: #333;">📦 Последние блоки</h2>
+            <div class="blocks-grid" id="blocksGrid">
+                <div class="loading">Загрузка блоков...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8081/api/v1';
+        let latestBlockNumber = 0;
+
+        // Инициализация
+        async function init() {
+            try {
+                // Проверка подключения к API
+                const response = await fetch(`${API_URL}/network`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const networkInfo = result.data;
+                    document.getElementById('chainId').textContent = networkInfo.chainId;
+                    document.getElementById('latestBlock').textContent = networkInfo.latestBlock;
+                    document.getElementById('gasPrice').textContent = networkInfo.gasPriceGwei + ' Gwei';
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('statusDot').className = 'status-dot status-connected';
+                    
+                    latestBlockNumber = networkInfo.latestBlock;
+                    
+                    // Запуск обновления
+                    getLatestBlocks();
+                    
+                    // Автообновление каждые 5 секунд
+                    setInterval(updateInfo, 5000);
+                    setInterval(getLatestBlocks, 10000);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Connection error:', error);
+                document.getElementById('connectionStatus').textContent = 'Disconnected';
+                showError('Не удалось подключиться к API. Убедитесь что API сервер запущен на localhost:8081');
+            }
+        }
+
+        // Обновление информации
+        async function updateInfo() {
+            try {
+                const response = await fetch(`${API_URL}/network`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const networkInfo = result.data;
+                    latestBlockNumber = networkInfo.latestBlock;
+                    document.getElementById('latestBlock').textContent = networkInfo.latestBlock;
+                    document.getElementById('gasPrice').textContent = networkInfo.gasPriceGwei + ' Gwei';
+                }
+                
+            } catch (error) {
+                console.error('Update error:', error);
+            }
+        }
+
+        // Получить последние блоки
+        async function getLatestBlocks() {
+            try {
+                const resultArea = document.getElementById('blocksGrid');
+                resultArea.innerHTML = '<div class="loading">Загрузка блоков...</div>';
+                
+                const response = await fetch(`${API_URL}/blocks/latest`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const blocks = result.data;
+                    
+                    resultArea.innerHTML = blocks.map(block => `
+                        <div class="block-card">
+                            <div class="block-number">Block #${block.number}</div>
+                            <div class="block-info">⏱️ ${new Date(block.timestamp).toLocaleString('ru-RU')}</div>
+                            <div class="block-info">👤 Miner: <span class="address-short">${block.miner.substring(0, 10)}...${block.miner.substring(38)}</span></div>
+                            <div class="block-info">📝 Transactions: ${block.transactionCount}</div>
+                            <div class="block-info">⛽ Gas Used: ${parseInt(block.gasUsed).toLocaleString()}</div>
+                            <div class="block-info">🔗 Hash: <span class="address-short">${block.hash.substring(0, 10)}...</span></div>
+                        </div>
+                    `).join('');
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error fetching blocks:', error);
+                showError('Ошибка загрузки блоков: ' + error.message);
+            }
+        }
+
+        // Поиск адреса
+        async function searchAddress() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                showError('Введите адрес');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                // Простая проверка формата адреса
+                if (!input.startsWith('0x') || input.length !== 42) {
+                    showError('Некорректный адрес Ethereum');
+                    return;
+                }
+                
+                const response = await fetch(`${API_URL}/address/${input}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const addressInfo = result.data;
+                    
+                    const resultArea = document.getElementById('resultArea');
+                    resultArea.innerHTML = `
+                        <div class="content-box">
+                            <h2 style="color: #333; margin-bottom: 20px;">💰 Информация об адресе</h2>
+                            <div class="balance-result">
+                                <div style="color: #666; margin-bottom: 10px;">Адрес:</div>
+                                <code style="font-size: 1.1em;">${addressInfo.address}</code>
+                                
+                                <div style="color: #666; margin-top: 20px; margin-bottom: 10px;">Баланс:</div>
+                                <div class="balance-amount">${parseFloat(addressInfo.balanceEth).toFixed(6)} ETH</div>
+                                
+                                <div style="color: #666; margin-top: 20px;">
+                                    <strong>Количество транзакций:</strong> ${addressInfo.txCount}
+                                </div>
+                                
+                                <div style="color: #666; margin-top: 10px;">
+                                    <strong>Тип:</strong> ${addressInfo.isContract ? '📄 Контракт' : '👤 Обычный адрес'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showError('Ошибка поиска адреса: ' + error.message);
+            }
+        }
+
+        // Поиск транзакции
+        async function searchTransaction() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                showError('Введите hash транзакции');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                const response = await fetch(`${API_URL}/transactions/${input}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const tx = result.data;
+                    
+                    const resultArea = document.getElementById('resultArea');
+                    resultArea.innerHTML = `
+                        <div class="content-box">
+                            <h2 style="color: #333; margin-bottom: 20px;">📝 Детали транзакции</h2>
+                            <div style="line-height: 2;">
+                                <div><strong>Hash:</strong> <code>${tx.hash}</code></div>
+                                <div><strong>Статус:</strong> ${tx.pending ? 
+                                    '<span style="color: orange;">⏳ Pending</span>' : 
+                                    (tx.status === 1 ? '<span style="color: green;">✅ Success</span>' : '<span style="color: red;">❌ Failed</span>')}</div>
+                                <div><strong>Block:</strong> ${tx.blockNumber || 'Pending'}</div>
+                                <div><strong>Gas Price:</strong> ${tx.gasPrice} Wei</div>
+                                <div><strong>Gas Limit:</strong> ${tx.gas}</div>
+                                ${tx.gasUsed ? `<div><strong>Gas Used:</strong> ${tx.gasUsed}</div>` : ''}
+                                <div><strong>Value:</strong> ${tx.value} Wei</div>
+                                <div><strong>Nonce:</strong> ${tx.nonce}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showError('Ошибка поиска транзакции: ' + error.message);
+            }
+        }
+
+        // Поиск блока
+        async function searchBlock() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                showError('Введите номер блока');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                const blockNum = parseInt(input);
+                if (isNaN(blockNum)) {
+                    showError('Введите корректный номер блока');
+                    return;
+                }
+                
+                const response = await fetch(`${API_URL}/blocks/${blockNum}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const block = result.data;
+                    
+                    const resultArea = document.getElementById('resultArea');
+                    resultArea.innerHTML = `
+                        <div class="content-box">
+                            <h2 style="color: #333; margin-bottom: 20px;">📦 Детали блока #${block.number}</h2>
+                            <div style="line-height: 2;">
+                                <div><strong>Timestamp:</strong> ${new Date(block.timestamp).toLocaleString('ru-RU')}</div>
+                                <div><strong>Hash:</strong> <code>${block.hash}</code></div>
+                                <div><strong>Miner:</strong> <code>${block.miner}</code></div>
+                                <div><strong>Gas Used:</strong> ${parseInt(block.gasUsed).toLocaleString()}</div>
+                                <div><strong>Transactions:</strong> ${block.transactionCount}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showError('Ошибка поиска блока: ' + error.message);
+            }
+        }
+
+        // Утилиты
+        function showLoading() {
+            document.getElementById('resultArea').innerHTML = '<div class="content-box"><div class="loading">Загрузка...</div></div>';
+        }
+
+        function showError(message) {
+            const resultArea = document.getElementById('resultArea');
+            resultArea.innerHTML = `<div class="content-box"><div class="error">❌ ${message}</div></div>`;
+        }
+
+        function showSuccess(message) {
+            const resultArea = document.getElementById('resultArea');
+            resultArea.innerHTML = `<div class="content-box"><div class="success">✅ ${message}</div></div>`;
+        }
+
+        // Запуск при загрузке страницы
+        window.addEventListener('load', init);
+        
+        // Enter для поиска
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const value = e.target.value.trim();
+                    if (value.startsWith('0x') && value.length === 66) {
+                        searchTransaction();
+                    } else if (value.startsWith('0x') && value.length === 42) {
+                        searchAddress();
+                    } else if (!isNaN(value)) {
+                        searchBlock();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
