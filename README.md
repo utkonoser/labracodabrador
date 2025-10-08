@@ -14,7 +14,8 @@
 - **Nginx Load Balancer** - распределяет RPC запросы  
 - **REST API** - удобный доступ к блокчейну
 - **Web Explorer** - веб-интерфейс для просмотра блокчейна
-- **Prometheus + Grafana** - мониторинг метрик
+- **Prometheus + Grafana** - мониторинг метрик и дашборды
+- **Loki + Promtail** - централизованное логирование
 - **Health checks** - автоматический перезапуск
 
 ## 🚀 Быстрый старт
@@ -37,8 +38,9 @@ make logs
 - 🌐 **Web Explorer:** http://localhost:8080
 - 🔗 **REST API:** http://localhost:8081/api/v1
 - ⚡ **RPC:** http://localhost:8545
-- 📊 **Grafana:** http://localhost:3000
+- 📊 **Grafana:** http://localhost:3000 (admin/admin)
 - 📈 **Prometheus:** http://localhost:9090
+- 📝 **Loki:** http://localhost:3100
 
 ## 📚 Документация
 
@@ -46,6 +48,8 @@ make logs
 
 - [**README.md**](docs/README.md) - Полная документация проекта
 - [**QUICK-START-PRODUCTION.md**](docs/QUICK-START-PRODUCTION.md) - Production чеклист
+- [**MONITORING.md**](docs/MONITORING.md) - Мониторинг и алерты
+- [**LOGGING.md**](docs/LOGGING.md) - Система логирования
 
 ## 🛠️ Команды Makefile
 
@@ -73,7 +77,10 @@ labracodabrador/
 │   ├── docker-compose.yml      # Docker orchestration
 │   ├── genesis-poa.json        # Genesis block
 │   ├── nginx.conf              # Load balancer
-│   └── prometheus.yml          # Metrics
+│   ├── prometheus.yml          # Metrics
+│   ├── prometheus-alerts.yml   # Alert rules
+│   ├── loki.yml                # Log aggregation
+│   └── promtail.yml            # Log collection
 │
 ├── docker/                     # Docker файлы
 │   └── Dockerfile.api          # API сервер
@@ -93,7 +100,9 @@ labracodabrador/
 │
 ├── docs/                       # Документация
 │   ├── README.md               # Полная документация
-│   └── QUICK-START-PRODUCTION.md
+│   ├── QUICK-START-PRODUCTION.md
+│   ├── MONITORING.md           # Мониторинг и алерты
+│   └── LOGGING.md              # Система логирования
 │
 └── [Makefile, go.mod, go.sum, .gitignore]
 ```
@@ -125,10 +134,18 @@ Currency:      ETH
 
 См. [Production Guide](docs/QUICK-START-PRODUCTION.md)
 
-## 📊 Мониторинг
+## 📊 Мониторинг и логирование
 
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:3000 (admin/admin)
+- **Prometheus**: http://localhost:9090 - сбор метрик
+- **Grafana**: http://localhost:3000 (admin/admin) - дашборды и визуализация
+- **Loki**: http://localhost:3100 - централизованное логирование
+
+### Доступные дашборды:
+- **Blockchain Overview** - общий обзор сети
+- **Node Details** - детали по узлам
+- **Logs Overview** - просмотр логов всех сервисов
+
+Подробнее: [MONITORING.md](docs/MONITORING.md)
 
 ## 🤝 Полезные ссылки
 

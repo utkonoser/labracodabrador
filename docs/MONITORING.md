@@ -1,10 +1,12 @@
-# Мониторинг Labracodabrador Blockchain
+# Мониторинг и логирование Labracodabrador Blockchain
 
 ## Обзор
 
-Система мониторинга включает:
+Система мониторинга и логирования включает:
 - **Prometheus** - сбор и хранение метрик
-- **Grafana** - визуализация и дашборды
+- **Grafana** - визуализация, дашборды и логи
+- **Loki** - централизованное хранение логов
+- **Promtail** - сбор логов из контейнеров и файлов
 - **Alertmanager** (опционально) - отправка алертов
 
 ## Доступ к системам мониторинга
@@ -19,6 +21,10 @@
 - **Targets**: http://localhost:9090/targets
 - **Alerts**: http://localhost:9090/alerts
 - **Rules**: http://localhost:9090/rules
+
+### Loki
+- **URL**: http://localhost:3100
+- **API**: http://localhost:3100/loki/api/v1/query
 
 ## Доступные дашборды
 
@@ -47,6 +53,56 @@
 - Информация о подключенных пирах
 - Активность пула транзакций
 - Реорганизации цепи
+
+### 3. Logs Overview
+Централизованный просмотр логов всех сервисов:
+- Все логи контейнеров
+- Логи signer нод
+- Логи RPC нод
+- Фильтрация по ошибкам и предупреждениям
+- Поиск по содержимому логов
+- Временные диапазоны
+
+## Система логирования
+
+### Loki
+Централизованное хранение логов:
+- **Конфигурация**: `config/loki.yml`
+- **Порт**: 3100
+- **Хранение**: файловая система (`/loki/chunks`)
+- **Retention**: 7 дней (настраивается)
+
+### Promtail
+Сбор логов из различных источников:
+- **Конфигурация**: `config/promtail.yml`
+- **Источники**:
+  - Docker контейнеры (через Docker socket)
+  - Файлы логов Geth (`/var/log/geth/*.log`)
+  - Файлы логов Prometheus (`/var/log/prometheus/*.log`)
+  - Файлы логов Grafana (`/var/log/grafana/*.log`)
+  - Файлы логов Nginx (`/var/log/nginx/*.log`)
+
+### Структура логов
+Логи автоматически помечаются метками:
+- `container_name` - имя контейнера
+- `job` - тип сервиса (geth, prometheus, grafana, nginx)
+- `level` - уровень лога (info, warn, error)
+- `source` - источник лога
+
+### Запросы логов в Grafana
+```logql
+# Все логи
+{container_name=~".+"}
+
+# Логи signer нод
+{container_name=~".*signer.*"}
+
+# Только ошибки
+{container_name=~".+"} |~ "(?i)(error|fatal|panic)"
+
+# Логи за последний час
+{container_name=~".+"} |= "block" | line_format "{{.timestamp}} {{.message}}"
+```
 
 ## Метрики Geth
 
@@ -258,18 +314,38 @@ curl -s http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | {alert: .labe
 2. Убедитесь, что файл алертов смонтирован: `docker exec labracodabrador-prometheus cat /etc/prometheus/alerts/prometheus-alerts.yml`
 3. Проверьте синтаксис правил в Prometheus UI
 
+### Логи не собираются
+1. Проверьте статус Promtail: `docker logs labracodabrador-promtail`
+2. Убедитесь, что Loki доступен: `curl http://localhost:3100/ready`
+3. Проверьте конфигурацию Promtail: `docker exec labracodabrador-promtail cat /etc/promtail/config.yml`
+4. Проверьте права доступа к Docker socket: `ls -la /var/run/docker.sock`
+
+### Логи не отображаются в Grafana
+1. Проверьте datasource Loki в Grafana: Configuration -> Data Sources
+2. Убедитесь, что Loki доступен из Grafana
+3. Проверьте запросы в дашборде Logs Overview
+4. Проверьте временной диапазон в дашборде
+
 ## Рекомендации
 
 1. **Регулярно мониторьте дашборд Blockchain Overview** для общего состояния сети
 2. **Настройте алерты** для критических метрик
-3. **Сохраняйте снапшоты** важных графиков при инцидентах
-4. **Регулярно проверяйте размер БД** и планируйте дисковое пространство
-5. **Мониторьте количество пиров** - если их мало, сеть может быть нестабильной
-6. **Следите за txpool** - большое количество pending транзакций может указывать на проблемы
+3. **Используйте дашборд Logs Overview** для анализа проблем
+4. **Сохраняйте снапшоты** важных графиков при инцидентах
+5. **Регулярно проверяйте размер БД** и планируйте дисковое пространство
+6. **Мониторьте количество пиров** - если их мало, сеть может быть нестабильной
+7. **Следите за txpool** - большое количество pending транзакций может указывать на проблемы
+8. **Настройте retention для логов** - по умолчанию 7 дней, увеличьте при необходимости
+9. **Используйте фильтры логов** для быстрого поиска ошибок и предупреждений
+10. **Мониторьте производительность Loki** - при большом объеме логов может потребоваться оптимизация
 
 ## Полезные ссылки
 
 - [Geth Metrics Documentation](https://geth.ethereum.org/docs/monitoring/metrics)
 - [Prometheus Query Language](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 - [Grafana Documentation](https://grafana.com/docs/)
+- [Loki Documentation](https://grafana.com/docs/loki/latest/)
+- [LogQL Query Language](https://grafana.com/docs/loki/latest/logql/)
+- [Promtail Configuration](https://grafana.com/docs/loki/latest/clients/promtail/)
+- [LOGGING.md](LOGGING.md) - Подробное руководство по системе логирования
 

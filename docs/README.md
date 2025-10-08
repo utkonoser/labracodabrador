@@ -6,8 +6,10 @@
 
 Готовая к production частная Ethereum сеть с:
 - **3 Signer ноды** - создают блоки через Clique PoA
+- **2 RPC ноды** - обрабатывают запросы
 - **Nginx Load Balancer** - распределяет RPC запросы  
-- **Prometheus + Grafana** - мониторинг метрик
+- **Prometheus + Grafana** - мониторинг метрик и дашборды
+- **Loki + Promtail** - централизованное логирование
 - **Health checks** - автоматический перезапуск
 
 ## 🏗️ Архитектура
@@ -36,6 +38,11 @@
             ▼                     ▼
      ┌────────────┐         ┌─────────┐
      │ Prometheus │         │ Grafana │  ← Мониторинг
+     └────────────┘         └─────────┘
+            │                     │
+            ▼                     ▼
+     ┌────────────┐         ┌─────────┐
+     │    Loki    │         │Promtail │  ← Логирование
      └────────────┘         └─────────┘
 ```
 
@@ -146,15 +153,23 @@ curl http://localhost:8081/api/v1/network
 
 ---
 
-## 📊 Мониторинг
+## 📊 Мониторинг и логирование
 
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:3000 (admin/admin)
+- **Prometheus**: http://localhost:9090 - сбор метрик
+- **Grafana**: http://localhost:3000 (admin/admin) - дашборды и визуализация
+- **Loki**: http://localhost:3100 - централизованное логирование
+
+### Доступные дашборды:
+- **Blockchain Overview** - общий обзор сети
+- **Node Details** - детали по узлам  
+- **Logs Overview** - просмотр логов всех сервисов
 
 **Метрики нод:**
 - Signer1: http://172.25.0.11:6060/debug/metrics
 - Signer2: http://172.25.0.12:6060/debug/metrics  
 - Signer3: http://172.25.0.13:6060/debug/metrics
+
+Подробнее: [MONITORING.md](MONITORING.md) | [LOGGING.md](LOGGING.md)
 
 ## 🔧 Управление
 

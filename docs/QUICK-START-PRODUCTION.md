@@ -11,6 +11,7 @@
 ✅ **Load Balancing** - Nginx распределяет RPC запросы
 
 ✅ **Мониторинг** - Prometheus + Grafana готовы
+✅ **Логирование** - Loki + Promtail настроены
 
 ### 🔥 Критические изменения для продакшна
 
@@ -111,8 +112,9 @@ certbot certonly --standalone -d your-domain.com
 
 - **Web Explorer:** http://your-domain:8080 (blockchain explorer UI)
 - **REST API:** http://your-domain:8081 (JSON endpoints)
-- **Grafana:** http://your-domain:3000 (admin/admin)
-- **Prometheus:** http://your-domain:9090
+- **Grafana:** http://your-domain:3000 (admin/admin) - дашборды и логи
+- **Prometheus:** http://your-domain:9090 - метрики
+- **Loki:** http://your-domain:3100 - логи
 - **Metrics endpoint:** http://localhost:6060/debug/metrics
 
 ### 🔍 Web Explorer & REST API
@@ -219,8 +221,9 @@ find /backup/ethereum -name "*.tar.gz" -mtime +30 -delete
 
 ### 📚 Дополнительные ресурсы
 
-- [PRODUCTION.md](./PRODUCTION.md) - Полное руководство по продакшну
 - [README.md](./README.md) - Основная документация
+- [MONITORING.md](./MONITORING.md) - Мониторинг и алерты
+- [LOGGING.md](./LOGGING.md) - Система логирования
 - [Geth Documentation](https://geth.ethereum.org/docs)
 - [Clique PoA](https://geth.ethereum.org/docs/fundamentals/consensus)
 
