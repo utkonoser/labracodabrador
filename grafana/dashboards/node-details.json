@@ -12,7 +12,7 @@
           "name": "node",
           "type": "query",
           "datasource": "Prometheus",
-          "query": "label_values(up, node_name)",
+          "query": "label_values(up, job)",
           "refresh": 1,
           "includeAll": false,
           "multi": false,
@@ -31,7 +31,7 @@
         "title": "Node Status",
         "targets": [
           {
-            "expr": "up{node_name=\"$node\"}",
+            "expr": "up{job=\"$node\"}",
             "refId": "A"
           }
         ],
@@ -68,7 +68,7 @@
         "title": "Current Block",
         "targets": [
           {
-            "expr": "chain_head_block{node_name=\"$node\"}",
+            "expr": "chain_head_block{job=\"$node\"}",
             "refId": "A"
           }
         ],
@@ -89,7 +89,7 @@
         "title": "Connected Peers",
         "targets": [
           {
-            "expr": "p2p_peers{node_name=\"$node\"}",
+            "expr": "p2p_peers{job=\"$node\"}",
             "refId": "A"
           }
         ],
@@ -123,7 +123,7 @@
         "title": "Pending Transactions",
         "targets": [
           {
-            "expr": "txpool_pending{node_name=\"$node\"}",
+            "expr": "txpool_pending{job=\"$node\"}",
             "refId": "A"
           }
         ],
@@ -144,7 +144,7 @@
         "title": "Sync Progress",
         "targets": [
           {
-            "expr": "chain_head_block{node_name=\"$node\"}",
+            "expr": "chain_head_block{job=\"$node\"}",
             "legendFormat": "Block Height",
             "refId": "A"
           }
@@ -161,12 +161,12 @@
         "title": "P2P Traffic",
         "targets": [
           {
-            "expr": "rate(p2p_ingress{node_name=\"$node\"}[5m])",
+            "expr": "rate(p2p_ingress{job=\"$node\"}[5m])",
             "legendFormat": "Ingress",
             "refId": "A"
           },
           {
-            "expr": "rate(p2p_egress{node_name=\"$node\"}[5m])",
+            "expr": "rate(p2p_egress{job=\"$node\"}[5m])",
             "legendFormat": "Egress",
             "refId": "B"
           }
@@ -183,17 +183,17 @@
         "title": "Memory Usage Detail",
         "targets": [
           {
-            "expr": "system_memory_allocs{node_name=\"$node\"}",
+            "expr": "system_memory_allocs{job=\"$node\"}",
             "legendFormat": "Allocated",
             "refId": "A"
           },
           {
-            "expr": "system_memory_used{node_name=\"$node\"}",
+            "expr": "system_memory_used{job=\"$node\"}",
             "legendFormat": "Used",
             "refId": "B"
           },
           {
-            "expr": "system_memory_held{node_name=\"$node\"}",
+            "expr": "system_memory_held{job=\"$node\"}",
             "legendFormat": "Held",
             "refId": "C"
           }
@@ -211,7 +211,7 @@
         "title": "Goroutines",
         "targets": [
           {
-            "expr": "system_goroutines{node_name=\"$node\"}",
+            "expr": "system_goroutines{job=\"$node\"}",
             "legendFormat": "Goroutines",
             "refId": "A"
           }
@@ -228,7 +228,7 @@
         "title": "Connected Peers Info",
         "targets": [
           {
-            "expr": "p2p_peers{node_name=\"$node\"}",
+            "expr": "p2p_peers{job=\"$node\"}",
             "format": "table",
             "instant": true,
             "refId": "A"
@@ -253,12 +253,12 @@
         "title": "Transaction Pool Activity",
         "targets": [
           {
-            "expr": "rate(txpool_valid{node_name=\"$node\"}[5m])",
+            "expr": "rate(txpool_valid{job=\"$node\"}[5m])",
             "legendFormat": "Valid TXs/s",
             "refId": "A"
           },
           {
-            "expr": "rate(txpool_invalid{node_name=\"$node\"}[5m])",
+            "expr": "rate(txpool_invalid{job=\"$node\"}[5m])",
             "legendFormat": "Invalid TXs/s",
             "refId": "B"
           }
@@ -275,12 +275,12 @@
         "title": "Chain Reorgs",
         "targets": [
           {
-            "expr": "chain_reorg_add{node_name=\"$node\"}",
+            "expr": "chain_reorg_add{job=\"$node\"}",
             "legendFormat": "Added",
             "refId": "A"
           },
           {
-            "expr": "chain_reorg_drop{node_name=\"$node\"}",
+            "expr": "chain_reorg_drop{job=\"$node\"}",
             "legendFormat": "Dropped",
             "refId": "B"
           }
