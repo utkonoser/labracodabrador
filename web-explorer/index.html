@@ -309,7 +309,8 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:9081/api/v1';
+        // Автоматическое определение API URL (работает локально и на сервере)
+        const API_URL = `http://${window.location.hostname}:9081/api/v1`;
         let latestBlockNumber = 0;
 
         // Извлечение адреса signer из extraData (Clique PoA)
@@ -366,7 +367,7 @@
             } catch (error) {
                 console.error('Connection error:', error);
                 document.getElementById('connectionStatus').textContent = 'Disconnected';
-                showError('Failed to connect to API. Make sure API server is running on localhost:9081');
+                showError(`Failed to connect to API. Make sure API server is running on ${window.location.hostname}:9081`);
             }
         }
 
