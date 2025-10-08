@@ -1,0 +1,204 @@
+{
+  "title": "System Resources",
+  "uid": "system-resources",
+  "tags": ["blockchain", "system", "hardware"],
+  "timezone": "browser",
+  "schemaVersion": 16,
+  "version": 1,
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      {
+        "name": "node",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(up, node_name)",
+        "refresh": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": {
+          "text": "signer1",
+          "value": "signer1"
+        },
+        "options": [
+          {"text": "signer1", "value": "signer1"},
+          {"text": "signer2", "value": "signer2"},
+          {"text": "signer3", "value": "signer3"},
+          {"text": "rpc1", "value": "rpc1"},
+          {"text": "rpc2", "value": "rpc2"}
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "type": "timeseries",
+      "title": "CPU Usage",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{node_name=\"$node\"}[5m]) * 100",
+          "legendFormat": "CPU %",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "percent", "label": "CPU Usage %", "min": 0, "max": 100},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"},
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "red", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "type": "timeseries",
+      "title": "Memory Usage",
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{node_name=\"$node\"} / 1024 / 1024",
+          "legendFormat": "Memory (MB)",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Memory (MB)"},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"}
+    },
+    {
+      "id": 3,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "type": "timeseries",
+      "title": "Goroutines",
+      "targets": [
+        {
+          "expr": "system_goroutines{node_name=\"$node\"}",
+          "legendFormat": "Goroutines",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Count"},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"}
+    },
+    {
+      "id": 4,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "type": "timeseries",
+      "title": "Open Files",
+      "targets": [
+        {
+          "expr": "process_open_fds{node_name=\"$node\"}",
+          "legendFormat": "Open Files",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Files"},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"}
+    },
+    {
+      "id": 5,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "type": "timeseries",
+      "title": "Network Ingress",
+      "targets": [
+        {
+          "expr": "rate(p2p_ingress{node_name=\"$node\"}[5m])",
+          "legendFormat": "Ingress (bytes/s)",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Bytes/sec"},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"}
+    },
+    {
+      "id": 6,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "type": "timeseries",
+      "title": "Network Egress",
+      "targets": [
+        {
+          "expr": "rate(p2p_egress{node_name=\"$node\"}[5m])",
+          "legendFormat": "Egress (bytes/s)",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Bytes/sec"},
+        {"format": "short", "label": ""}
+      ],
+      "xAxis": {"mode": "time", "name": "Time", "type": "time"}
+    },
+    {
+      "id": 7,
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 24},
+      "type": "stat",
+      "title": "System Resources Summary",
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{node_name=\"$node\"} / 1024 / 1024",
+          "legendFormat": "Memory (MB)",
+          "refId": "A"
+        },
+        {
+          "expr": "system_goroutines{node_name=\"$node\"}",
+          "legendFormat": "Goroutines",
+          "refId": "B"
+        },
+        {
+          "expr": "process_open_fds{node_name=\"$node\"}",
+          "legendFormat": "Open Files",
+          "refId": "C"
+        },
+        {
+          "expr": "rate(process_cpu_seconds_total{node_name=\"$node\"}[5m]) * 100",
+          "legendFormat": "CPU %",
+          "refId": "D"
+        }
+      ],
+      "options": {
+        "graphMode": "none",
+        "colorMode": "value",
+        "textMode": "value_and_name",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "editable": true
+}
+
