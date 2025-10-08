@@ -19,7 +19,14 @@
           "current": {
             "text": "signer1",
             "value": "signer1"
-          }
+          },
+          "options": [
+            {"text": "signer1", "value": "signer1"},
+            {"text": "signer2", "value": "signer2"},
+            {"text": "signer3", "value": "signer3"},
+            {"text": "rpc1", "value": "rpc1"},
+            {"text": "rpc2", "value": "rpc2"}
+          ]
         }
       ]
     },
@@ -31,7 +38,7 @@
         "title": "Node Status",
         "targets": [
           {
-            "expr": "up{job=\"$node\"}",
+            "expr": "up{job=\"$node\"} or vector(0)",
             "refId": "A"
           }
         ],
