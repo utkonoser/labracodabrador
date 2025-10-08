@@ -172,8 +172,8 @@ services:
     image: nginx:alpine
     container_name: labracodabrador-nginx
     ports:
-      - "8545:8545"
-      - "8546:8546"
+      - "9545:8545"
+      - "9546:8546"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
@@ -198,7 +198,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=30d'
     ports:
-      - "9090:9090"
+      - "10090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus-alerts.yml:/etc/prometheus/alerts/prometheus-alerts.yml:ro
@@ -212,7 +212,7 @@ services:
     image: grafana/loki:latest
     container_name: labracodabrador-loki
     ports:
-      - "3100:3100"
+      - "4100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./loki.yml:/etc/loki/local-config.yaml:ro
@@ -240,7 +240,7 @@ services:
     image: grafana/grafana:latest
     container_name: labracodabrador-grafana
     ports:
-      - "3000:3000"
+      - "4000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -262,7 +262,7 @@ services:
       dockerfile: docker/Dockerfile.api
     container_name: labracodabrador-api
     ports:
-      - "8081:8081"
+      - "9081:8081"
     networks:
       - blockchain-network
     depends_on:
@@ -279,7 +279,7 @@ services:
     volumes:
       - ../web-explorer:/usr/share/nginx/html:ro
     ports:
-      - "8080:80"
+      - "9080:80"
     networks:
       - blockchain-network
     depends_on:

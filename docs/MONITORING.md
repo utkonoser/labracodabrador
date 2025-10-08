@@ -12,19 +12,19 @@
 ## Доступ к системам мониторинга
 
 ### Grafana
-- **URL**: http://localhost:3000
+- **URL**: http://localhost:4000
 - **Логин**: admin
 - **Пароль**: admin
 
 ### Prometheus
-- **URL**: http://localhost:9090
-- **Targets**: http://localhost:9090/targets
-- **Alerts**: http://localhost:9090/alerts
-- **Rules**: http://localhost:9090/rules
+- **URL**: http://localhost:10090
+- **Targets**: http://localhost:10090/targets
+- **Alerts**: http://localhost:10090/alerts
+- **Rules**: http://localhost:10090/rules
 
 ### Loki
-- **URL**: http://localhost:3100
-- **API**: http://localhost:3100/loki/api/v1/query
+- **URL**: http://localhost:4100
+- **API**: http://localhost:4100/loki/api/v1/query
 
 ## Доступные дашборды
 
@@ -265,17 +265,17 @@ receivers:
 curl http://172.25.0.11:6060/debug/metrics/prometheus | grep chain_head_block
 
 # Проверка через Prometheus API
-curl 'http://localhost:9090/api/v1/query?query=chain_head_block'
+curl 'http://localhost:10090/api/v1/query?query=chain_head_block'
 ```
 
 ### Проверка статуса targets
 ```bash
-curl -s http://localhost:9090/api/v1/targets | jq '.data.activeTargets[] | {job: .labels.job, health: .health, error: .lastError}'
+curl -s http://localhost:10090/api/v1/targets | jq '.data.activeTargets[] | {job: .labels.job, health: .health, error: .lastError}'
 ```
 
 ### Проверка активных алертов
 ```bash
-curl -s http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | {alert: .labels.alertname, state: .state}'
+curl -s http://localhost:10090/api/v1/alerts | jq '.data.alerts[] | {alert: .labels.alertname, state: .state}'
 ```
 
 ## Расширенная настройка
@@ -300,7 +300,7 @@ curl -s http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | {alert: .labe
 ## Troubleshooting
 
 ### Метрики не собираются
-1. Проверьте targets: http://localhost:9090/targets
+1. Проверьте targets: http://localhost:10090/targets
 2. Убедитесь, что узлы доступны: `curl http://172.25.0.11:6060/debug/metrics/prometheus`
 3. Проверьте логи Prometheus: `docker logs labracodabrador-prometheus`
 
@@ -310,13 +310,13 @@ curl -s http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | {alert: .labe
 3. Проверьте логи Grafana: `docker logs labracodabrador-grafana`
 
 ### Алерты не работают
-1. Проверьте правила: http://localhost:9090/rules
+1. Проверьте правила: http://localhost:10090/rules
 2. Убедитесь, что файл алертов смонтирован: `docker exec labracodabrador-prometheus cat /etc/prometheus/alerts/prometheus-alerts.yml`
 3. Проверьте синтаксис правил в Prometheus UI
 
 ### Логи не собираются
 1. Проверьте статус Promtail: `docker logs labracodabrador-promtail`
-2. Убедитесь, что Loki доступен: `curl http://localhost:3100/ready`
+2. Убедитесь, что Loki доступен: `curl http://localhost:4100/ready`
 3. Проверьте конфигурацию Promtail: `docker exec labracodabrador-promtail cat /etc/promtail/config.yml`
 4. Проверьте права доступа к Docker socket: `ls -la /var/run/docker.sock`
 

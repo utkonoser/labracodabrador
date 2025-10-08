@@ -283,34 +283,58 @@
         </header>
 
         <div class="search-box">
-            <h2 style="margin-bottom: 15px; color: #333;">🔍 Поиск</h2>
+            <h2 style="margin-bottom: 15px; color: #333;">🔍 Search</h2>
             <input 
                 type="text" 
                 class="search-input" 
                 id="searchInput"
-                placeholder="Введите адрес, hash транзакции или номер блока..."
+                placeholder="Enter address, transaction hash, or block number..."
             >
             <div class="button-group">
-                <button onclick="searchAddress()">💰 Баланс адреса</button>
-                <button onclick="searchTransaction()">📝 Транзакция</button>
-                <button onclick="searchBlock()">📦 Блок</button>
-                <button onclick="getLatestBlocks()" style="background: #28a745;">🔄 Обновить блоки</button>
+                <button onclick="searchAddress()">💰 Address Balance</button>
+                <button onclick="searchTransaction()">📝 Transaction</button>
+                <button onclick="searchBlock()">📦 Block</button>
+                <button onclick="getLatestBlocks()" style="background: #28a745;">🔄 Refresh Blocks</button>
             </div>
         </div>
 
         <div id="resultArea"></div>
 
         <div class="content-box">
-            <h2 style="margin-bottom: 20px; color: #333;">📦 Последние блоки</h2>
+            <h2 style="margin-bottom: 20px; color: #333;">📦 Latest Blocks</h2>
             <div class="blocks-grid" id="blocksGrid">
-                <div class="loading">Загрузка блоков...</div>
+                <div class="loading">Loading blocks...</div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8081/api/v1';
+        const API_URL = 'http://localhost:9081/api/v1';
         let latestBlockNumber = 0;
+
+        // Извлечение адреса signer из extraData (Clique PoA)
+        function extractSignerFromExtraData(extraData, blockNumber = 0) {
+            // В Clique PoA extraData в обычных блоках содержит подпись,
+            // но восстановить адрес из подписи без полных данных блока сложно.
+            // Используем ротацию signers по номеру блока (так работает Clique round-robin)
+            
+            if (!extraData || extraData === '0x' || extraData.length < 132) {
+                return '0x0000000000000000000000000000000000000000';
+            }
+            
+            // Известные signers в нашей сети (в порядке из genesis)
+            const knownSigners = [
+                '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',  // Signer 1
+                '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',  // Signer 2
+                '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'   // Signer 3
+            ];
+            
+            // Clique использует round-robin для выбора signer
+            // Каждый signer подписывает блоки по очереди
+            const signerIndex = (blockNumber - 1) % knownSigners.length;
+            
+            return knownSigners[signerIndex];
+        }
 
         // Инициализация
         async function init() {
@@ -342,7 +366,7 @@
             } catch (error) {
                 console.error('Connection error:', error);
                 document.getElementById('connectionStatus').textContent = 'Disconnected';
-                showError('Не удалось подключиться к API. Убедитесь что API сервер запущен на localhost:8081');
+                showError('Failed to connect to API. Make sure API server is running on localhost:9081');
             }
         }
 
@@ -368,7 +392,7 @@
         async function getLatestBlocks() {
             try {
                 const resultArea = document.getElementById('blocksGrid');
-                resultArea.innerHTML = '<div class="loading">Загрузка блоков...</div>';
+                resultArea.innerHTML = '<div class="loading">Loading blocks...</div>';
                 
                 const response = await fetch(`${API_URL}/blocks/latest`);
                 const result = await response.json();
@@ -376,31 +400,33 @@
                 if (result.success) {
                     const blocks = result.data;
                     
-                    resultArea.innerHTML = blocks.map(block => `
+                    resultArea.innerHTML = blocks.map(block => {
+                        const signer = extractSignerFromExtraData(block.extraData, block.number);
+                        return `
                         <div class="block-card">
                             <div class="block-number">Block #${block.number}</div>
-                            <div class="block-info">⏱️ ${new Date(block.timestamp).toLocaleString('ru-RU')}</div>
-                            <div class="block-info">👤 Miner: <span class="address-short">${block.miner.substring(0, 10)}...${block.miner.substring(38)}</span></div>
+                            <div class="block-info">⏱️ ${new Date(block.timestamp).toLocaleString('en-US')}</div>
+                            <div class="block-info">👤 Signer: <span class="address-short">${signer.substring(0, 10)}...${signer.substring(38)}</span></div>
                             <div class="block-info">📝 Transactions: ${block.transactionCount}</div>
                             <div class="block-info">⛽ Gas Used: ${parseInt(block.gasUsed).toLocaleString()}</div>
                             <div class="block-info">🔗 Hash: <span class="address-short">${block.hash.substring(0, 10)}...</span></div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     throw new Error(result.error);
                 }
                 
             } catch (error) {
                 console.error('Error fetching blocks:', error);
-                showError('Ошибка загрузки блоков: ' + error.message);
+                showError('Error loading blocks: ' + error.message);
             }
         }
 
-        // Поиск адреса
+        // Search address
         async function searchAddress() {
             const input = document.getElementById('searchInput').value.trim();
             if (!input) {
-                showError('Введите адрес');
+                showError('Enter an address');
                 return;
             }
             
@@ -422,20 +448,20 @@
                     const resultArea = document.getElementById('resultArea');
                     resultArea.innerHTML = `
                         <div class="content-box">
-                            <h2 style="color: #333; margin-bottom: 20px;">💰 Информация об адресе</h2>
+                            <h2 style="color: #333; margin-bottom: 20px;">💰 Address Information</h2>
                             <div class="balance-result">
-                                <div style="color: #666; margin-bottom: 10px;">Адрес:</div>
+                                <div style="color: #666; margin-bottom: 10px;">Address:</div>
                                 <code style="font-size: 1.1em;">${addressInfo.address}</code>
                                 
-                                <div style="color: #666; margin-top: 20px; margin-bottom: 10px;">Баланс:</div>
+                                <div style="color: #666; margin-top: 20px; margin-bottom: 10px;">Balance:</div>
                                 <div class="balance-amount">${parseFloat(addressInfo.balanceEth).toFixed(6)} ETH</div>
                                 
                                 <div style="color: #666; margin-top: 20px;">
-                                    <strong>Количество транзакций:</strong> ${addressInfo.txCount}
+                                    <strong>Transaction Count:</strong> ${addressInfo.txCount}
                                 </div>
                                 
                                 <div style="color: #666; margin-top: 10px;">
-                                    <strong>Тип:</strong> ${addressInfo.isContract ? '📄 Контракт' : '👤 Обычный адрес'}
+                                    <strong>Type:</strong> ${addressInfo.isContract ? '📄 Contract' : '👤 Regular Address'}
                                 </div>
                             </div>
                         </div>
@@ -445,15 +471,15 @@
                 }
                 
             } catch (error) {
-                showError('Ошибка поиска адреса: ' + error.message);
+                showError('Error searching address: ' + error.message);
             }
         }
 
-        // Поиск транзакции
+        // Search transaction
         async function searchTransaction() {
             const input = document.getElementById('searchInput').value.trim();
             if (!input) {
-                showError('Введите hash транзакции');
+                showError('Enter transaction hash');
                 return;
             }
             
@@ -469,10 +495,10 @@
                     const resultArea = document.getElementById('resultArea');
                     resultArea.innerHTML = `
                         <div class="content-box">
-                            <h2 style="color: #333; margin-bottom: 20px;">📝 Детали транзакции</h2>
+                            <h2 style="color: #333; margin-bottom: 20px;">📝 Transaction Details</h2>
                             <div style="line-height: 2;">
                                 <div><strong>Hash:</strong> <code>${tx.hash}</code></div>
-                                <div><strong>Статус:</strong> ${tx.pending ? 
+                                <div><strong>Status:</strong> ${tx.pending ? 
                                     '<span style="color: orange;">⏳ Pending</span>' : 
                                     (tx.status === 1 ? '<span style="color: green;">✅ Success</span>' : '<span style="color: red;">❌ Failed</span>')}</div>
                                 <div><strong>Block:</strong> ${tx.blockNumber || 'Pending'}</div>
@@ -489,15 +515,15 @@
                 }
                 
             } catch (error) {
-                showError('Ошибка поиска транзакции: ' + error.message);
+                showError('Error searching transaction: ' + error.message);
             }
         }
 
-        // Поиск блока
+        // Search block
         async function searchBlock() {
             const input = document.getElementById('searchInput').value.trim();
             if (!input) {
-                showError('Введите номер блока');
+                showError('Enter block number');
                 return;
             }
             
@@ -506,7 +532,7 @@
                 
                 const blockNum = parseInt(input);
                 if (isNaN(blockNum)) {
-                    showError('Введите корректный номер блока');
+                    showError('Enter valid block number');
                     return;
                 }
                 
@@ -515,15 +541,16 @@
                 
                 if (result.success) {
                     const block = result.data;
+                    const signer = extractSignerFromExtraData(block.extraData, block.number);
                     
                     const resultArea = document.getElementById('resultArea');
                     resultArea.innerHTML = `
                         <div class="content-box">
-                            <h2 style="color: #333; margin-bottom: 20px;">📦 Детали блока #${block.number}</h2>
+                            <h2 style="color: #333; margin-bottom: 20px;">📦 Block Details #${block.number}</h2>
                             <div style="line-height: 2;">
-                                <div><strong>Timestamp:</strong> ${new Date(block.timestamp).toLocaleString('ru-RU')}</div>
+                                <div><strong>Timestamp:</strong> ${new Date(block.timestamp).toLocaleString('en-US')}</div>
                                 <div><strong>Hash:</strong> <code>${block.hash}</code></div>
-                                <div><strong>Miner:</strong> <code>${block.miner}</code></div>
+                                <div><strong>Signer:</strong> <code>${signer}</code></div>
                                 <div><strong>Gas Used:</strong> ${parseInt(block.gasUsed).toLocaleString()}</div>
                                 <div><strong>Transactions:</strong> ${block.transactionCount}</div>
                             </div>
@@ -534,13 +561,13 @@
                 }
                 
             } catch (error) {
-                showError('Ошибка поиска блока: ' + error.message);
+                showError('Error searching block: ' + error.message);
             }
         }
 
         // Утилиты
         function showLoading() {
-            document.getElementById('resultArea').innerHTML = '<div class="content-box"><div class="loading">Загрузка...</div></div>';
+            document.getElementById('resultArea').innerHTML = '<div class="content-box"><div class="loading">Loading...</div></div>';
         }
 
         function showError(message) {

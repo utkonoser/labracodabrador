@@ -32,6 +32,7 @@ type BlockInfo struct {
 	Hash             string    `json:"hash"`
 	Timestamp        time.Time `json:"timestamp"`
 	Miner            string    `json:"miner"`
+	ExtraData        string    `json:"extraData"`
 	TransactionCount int       `json:"transactionCount"`
 	GasUsed          uint64    `json:"gasUsed"`
 }
@@ -176,6 +177,7 @@ func getLatestBlocks(w http.ResponseWriter, r *http.Request) {
 			Hash:             block.Hash().Hex(),
 			Timestamp:        time.Unix(int64(block.Time()), 0),
 			Miner:            block.Coinbase().Hex(),
+			ExtraData:        "0x" + common.Bytes2Hex(block.Extra()),
 			TransactionCount: len(block.Transactions()),
 			GasUsed:          block.GasUsed(),
 		}
@@ -213,6 +215,7 @@ func getBlock(w http.ResponseWriter, r *http.Request) {
 		Hash:             block.Hash().Hex(),
 		Timestamp:        time.Unix(int64(block.Time()), 0),
 		Miner:            block.Coinbase().Hex(),
+		ExtraData:        "0x" + common.Bytes2Hex(block.Extra()),
 		TransactionCount: len(block.Transactions()),
 		GasUsed:          block.GasUsed(),
 	}

@@ -246,10 +246,10 @@ scrape_configs:
 
 ```bash
 # Статус Loki
-curl http://localhost:3100/ready
+curl http://localhost:4100/ready
 
 # Статус Promtail
-curl http://localhost:9080/ready
+curl http://localhost:10080/ready
 
 # Логи Promtail
 docker logs labracodabrador-promtail
@@ -268,7 +268,7 @@ docker exec labracodabrador-promtail cat /tmp/positions.yaml
 docker exec labracodabrador-promtail cat /etc/promtail/config.yml
 
 # Проверка доступности Loki API
-curl "http://localhost:3100/loki/api/v1/query?query={container_name=~".+"}&limit=10"
+curl "http://localhost:4100/loki/api/v1/query?query={container_name=~".+"}&limit=10"
 ```
 
 ### Проверка файлов логов
@@ -298,7 +298,7 @@ tail -f logs/grafana/grafana.log
 
 2. **Проверьте доступность Loki**:
    ```bash
-   curl http://localhost:3100/ready
+   curl http://localhost:4100/ready
    ```
 
 3. **Проверьте права доступа к Docker socket**:

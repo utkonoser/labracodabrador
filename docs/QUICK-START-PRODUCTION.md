@@ -110,11 +110,11 @@ certbot certonly --standalone -d your-domain.com
 
 ### 📊 Мониторинг и Explorer
 
-- **Web Explorer:** http://your-domain:8080 (blockchain explorer UI)
-- **REST API:** http://your-domain:8081 (JSON endpoints)
-- **Grafana:** http://your-domain:3000 (admin/admin) - дашборды и логи
-- **Prometheus:** http://your-domain:9090 - метрики
-- **Loki:** http://your-domain:3100 - логи
+- **Web Explorer:** http://your-domain:9080 (blockchain explorer UI)
+- **REST API:** http://your-domain:9081 (JSON endpoints)
+- **Grafana:** http://your-domain:4000 (admin/admin) - дашборды и логи
+- **Prometheus:** http://your-domain:10090 - метрики
+- **Loki:** http://your-domain:4100 - логи
 - **Metrics endpoint:** http://localhost:6060/debug/metrics
 
 ### 🔍 Web Explorer & REST API
@@ -126,10 +126,10 @@ certbot certonly --standalone -d your-domain.com
 docker-compose up -d
 
 # Web Explorer (UI)
-open http://localhost:8080
+open http://localhost:9080
 
 # REST API
-curl http://localhost:8081/api/v1/network
+curl http://localhost:9081/api/v1/network
 ```
 
 **Web Explorer функции:**

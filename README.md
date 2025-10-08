@@ -35,12 +35,14 @@ make logs
 
 **Готово!** 🎉
 
-- 🌐 **Web Explorer:** http://localhost:8080
-- 🔗 **REST API:** http://localhost:8081/api/v1
-- ⚡ **RPC:** http://localhost:8545
-- 📊 **Grafana:** http://localhost:3000 (admin/admin)
-- 📈 **Prometheus:** http://localhost:9090
-- 📝 **Loki:** http://localhost:3100
+- 🌐 **Web Explorer:** http://localhost:9080
+- 🔗 **REST API:** http://localhost:9081/api/v1
+- ⚡ **RPC:** http://localhost:9545
+- 📊 **Grafana:** http://localhost:4000 (admin/admin)
+- 📈 **Prometheus:** http://localhost:10090
+- 📝 **Loki:** http://localhost:4100
+
+> 💡 **Порты:** Все порты подняты на +1000 для избежания конфликтов с другими приложениями на сервере
 
 ## 📚 Документация
 
@@ -111,7 +113,7 @@ labracodabrador/
 
 ```
 Network Name:  Labracodabrador PoA
-RPC URL:       http://localhost:8545
+RPC URL:       http://localhost:9545
 Chain ID:      32382
 Currency:      ETH
 ```
@@ -136,9 +138,9 @@ Currency:      ETH
 
 ## 📊 Мониторинг и логирование
 
-- **Prometheus**: http://localhost:9090 - сбор метрик
-- **Grafana**: http://localhost:3000 (admin/admin) - дашборды и визуализация
-- **Loki**: http://localhost:3100 - централизованное логирование
+- **Prometheus**: http://localhost:10090 - сбор метрик
+- **Grafana**: http://localhost:4000 (admin/admin) - дашборды и визуализация
+- **Loki**: http://localhost:4100 - централизованное логирование
 
 ### Доступные дашборды:
 - **Blockchain Overview** - общий обзор сети
